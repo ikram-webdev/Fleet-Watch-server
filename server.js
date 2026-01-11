@@ -6,11 +6,16 @@ require('dotenv').config();
 const app = express();
 
 // --- STEP 1: MIDDLEWARES ---
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',                   // Local testing ke liye
+    'https://fleet-watch-project.vercel.app'  // Live site ke liye
+  ],
+  credentials: true
+};
 
-app.use(cors({
-    origin: [process.env.CLIENT_URL || 'http://localhost:5173'],
-    credentials: true
-}));
+app.use(cors(corsOptions));
+
 app.use(express.json()); 
 
 // --- STEP 2: ROUTES IMPORT ---
