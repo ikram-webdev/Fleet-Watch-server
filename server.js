@@ -7,13 +7,10 @@ const app = express();
 
 // --- STEP 1: MIDDLEWARES ---
 const corsOptions = {
-  origin: [
-    'http://localhost:5173',                   // Local testing ke liye
-    'https://fleet-watch-project.vercel.app'  // Live site ke liye
-  ],
-  credentials: true
+  origin: 'https://fleet-watch-project.vercel.app', 
+  credentials: true,
+  optionsSuccessStatus: 200
 };
-
 app.use(cors(corsOptions));
 
 app.use(express.json()); 
