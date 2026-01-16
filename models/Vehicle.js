@@ -1,34 +1,37 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const VehicleSchema = new mongoose.Schema({
-    plateNumber: { 
-        type: String, 
-        required: true, 
-        unique: true,
-        uppercase: true // Auto capital letters for plate number
+const VehicleSchema = new mongoose.Schema(
+  {
+    plateNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      uppercase: true,
     },
-    model: { 
-        type: String, 
-        required: true 
+    model: {
+      type: String,
+      required: true,
     },
-    status: { 
-        type: String, 
-        enum: ['Available', 'Maintenance', 'On Trip'], // Sirf yehi 3 options allow honge
-        default: 'Available' 
+    status: {
+      type: String,
+      enum: ["Available", "Maintenance", "On Trip"],
+      default: "Available",
     },
-    assignedDriver: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User', 
-        default: null 
+    assignedDriver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
     },
-    // --- Nayi Fields jo Features chalane ke liye zaroori hain ---
-    lastMaintenanceDate: { 
-        type: Date 
+
+    lastMaintenanceDate: {
+      type: Date,
     },
     currentTrip: {
-        startTime: { type: Date },
-        destination: { type: String }
-    }
-}, { timestamps: true }); // Is se 'createdAt' aur 'updatedAt' khud ban jayenge
+      startTime: { type: Date },
+      destination: { type: String },
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Vehicle', VehicleSchema);
+module.exports = mongoose.model("Vehicle", VehicleSchema);
