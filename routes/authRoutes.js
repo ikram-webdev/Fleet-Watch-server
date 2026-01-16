@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { forgotPassword } = require('../controllers/authController');
 
 router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', authController.resetPassword);
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;

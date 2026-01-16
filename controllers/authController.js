@@ -1,15 +1,14 @@
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User'); 
+const bcrypt = require('bcryptjs'); 
 
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
-
   try {
-    
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ message: "Is email ka koi user mojood nahi hai." });
+      return res.status(404).json({ message: "User not found." });
     }
 
     const resetToken = jwt.sign(
@@ -48,5 +47,34 @@ exports.forgotPassword = async (req, res) => {
   } catch (error) {
     console.error("Error in forgotPassword:", error);
     res.status(500).json({ message: "Server error occurred." });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const { token } = req.params; 
+  const { password } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    
+    await user.save();
+
+    res.status(200).json({ message: "Password updated successfully." });
+
+  } catch (error) {
+    console.error("Error in resetPassword:", error);
+    if (error.name === 'TokenExpiredError') {
+        return res.status(400).json({ message: "Link expired. Please request a new one." });
+    }
+    res.status(400).json({ message: "Invalid Token." });
   }
 };
