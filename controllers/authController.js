@@ -1,36 +1,31 @@
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Apne User model ka sahi path check kar lein
+const User = require('../models/User'); 
 
-// 1. Forgot Password Function
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
-    // Check karein ke user database mein hai ya nahi
+    
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "Is email ka koi user mojood nahi hai." });
     }
 
-    // Ek temporary token banayein (10 minutes ke liye valid)
     const resetToken = jwt.sign(
       { id: user._id }, 
       process.env.JWT_SECRET, 
       { expiresIn: '10m' }
     );
 
-    // NodeMailer Transporter Setup
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER, // Aapki email (.env se)
-        pass: process.env.EMAIL_PASS  // Aapka App Password (.env se)
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS  
       }
     });
 
-    // Reset Link (Frontend ka URL)
-    // Note: Localhost ko production URL se replace karein jab deploy karein
     const resetUrl = `https://fleet-watch-project.vercel.app/reset-password/${resetToken}`;
 
     const mailOptions = {
@@ -48,10 +43,10 @@ exports.forgotPassword = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: "Reset link aapki email par bhej diya gaya hai." });
+    res.status(200).json({ message: "Reset link sent to your email." });
 
   } catch (error) {
     console.error("Error in forgotPassword:", error);
-    res.status(500).json({ message: "Server mein masla aa gaya hai." });
+    res.status(500).json({ message: "Server error occurred." });
   }
 };
