@@ -2,10 +2,13 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const { forgotPassword } = require('../controllers/authController');
+const authController = require('../controllers/authController');
 
-router.post('/forgot-password', forgotPassword);
+// --- Forgot & Reset Password Routes ---
+router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password/:token', authController.resetPassword);
+
+// --- Register Route ---
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -26,6 +29,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// --- Login Route ---
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -40,9 +44,10 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Invalid Email or Password" });
     }
 
+    // Yahan .env ka JWT_SECRET use kiya gaya hai security ke liye
     const token = jwt.sign(
       { id: user._id, role: user.role },
-      "secret_key_123",
+      process.env.JWT_SECRET || "secret_key_123",
       { expiresIn: "1d" }
     );
 
@@ -59,6 +64,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// --- Driver Management Routes ---
 router.get("/all-drivers", async (req, res) => {
   try {
     const drivers = await User.find({ role: "Driver" }).select("-password");
